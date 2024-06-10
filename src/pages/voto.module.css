@@ -1,0 +1,17 @@
+.checkBoxCard {
+  width: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.checkBoxCard .ant-checkbox {
+  width: 100% !important;
+  background-color: RGB(16, 194, 56) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 30px !important;
+}
