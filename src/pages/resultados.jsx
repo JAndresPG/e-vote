@@ -1,20 +1,50 @@
 import { Col, Row, Select, notification } from "antd"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { url } from "../extra/constants"
 import { optionsGet } from "../extra/methods"
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
+  // Bar,
+  // BarChart,
+  // CartesianGrid,
+  Cell,
   Legend,
-  // Pie,
-  // PieChart,
-  Tooltip,
-  XAxis,
-  YAxis,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  // Tooltip,
+  // XAxis,
+  // YAxis,
 } from "recharts"
 import { useLayout } from "../hooks/others/useLayout"
+
+const COLORS = [
+  "#FF5733", // Ana López
+  "#33FF57", // Carlos Rodríguez
+  "#3357FF", // Elena Díaz
+  "#FF33A8", // José Hernández
+  "#33FFF5", // José Párraga
+  "#FF8C33", // Juan Pérez
+  "#8C33FF", // Laura Gómez
+  "#FFBB28", // Luis Martínez
+  "#FF3333", // María González
+  "#33A8FF", // Miguel Fernández
+  "#B8B8B8", // Votos nulos
+  "#E0E0E0", // Votos en blanco
+]
+
+const RADIAN = Math.PI / 180
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? "start" : "end"} dominantBaseline="central">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  )
+}
 
 export function Resultados() {
   useLayout("Resultados")
@@ -23,8 +53,34 @@ export function Resultados() {
 
   const [eventos, setEventos] = useState([])
   const [selectedEvent, setSelectedEvent] = useState()
-  const [candidatos, setCandidatos] = useState()
+  const [candidatos, setCandidatos] = useState([])
   const [votosPorCandidato, setVotosPorCandidato] = useState()
+
+  const data = useMemo(
+    () =>
+      candidatos.length > 0
+        ? [
+            ...candidatos.map((c) => ({
+              name: c.nombres.split(" ")[0] + " " + c.apellidos.split(" ")[0],
+              value: Number(
+                votosPorCandidato?.candidatosVotos?.find((cv) => cv.candidato == c.cod_persona)
+                  ?.votos ?? 0
+              ),
+            })),
+            {
+              name: "Votos nulos",
+              value: Number(votosPorCandidato?.votosNulos ?? 0),
+            },
+            {
+              name: "Votos en blanco",
+              value: Number(votosPorCandidato?.votosEnBlanco ?? 0),
+            },
+          ]
+        : [],
+    [candidatos, votosPorCandidato]
+  )
+
+  console.log(data)
 
   const navigate = useNavigate()
 
@@ -105,7 +161,30 @@ export function Resultados() {
           />
         </Col>
         <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-          <BarChart
+          <ResponsiveContainer width="100%" aspect={2}>
+            <PieChart width={1000} height={1000}>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={95}
+                fill="#8884d8"
+                dataKey="value"
+                // nameKey="name"
+                // onClick={handleClick}
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+
+              {/* <Tooltip content={<CustomTooltip />} /> */}
+              <Legend height={1} iconSize={8} />
+            </PieChart>
+          </ResponsiveContainer>
+          {/* <BarChart
             layout="horizontal"
             width={730}
             height={250}
@@ -134,7 +213,7 @@ export function Resultados() {
             <Tooltip />
             <Legend />
             <Bar dataKey="Votos" fill="#8884d8" />
-          </BarChart>
+          </BarChart> */}
         </Col>
       </Row>
     </>
