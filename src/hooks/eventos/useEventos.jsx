@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom"
 
 import { optionsGet, optionsPost } from "../../extra/methods"
 import { url } from "../../extra/constants"
+import { useLayout } from "../others/useLayout"
 
 export function useEventos() {
+  useLayout("Procesos electorales")
   const [eventos, setEventos] = useState()
   const [openModal, setOpenModal] = useState(false)
 

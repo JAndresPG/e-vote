@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { url } from "../extra/constants"
 import { optionsGet } from "../extra/methods"
+
+import { useScreenSize } from "../hooks/others/useScreenSize"
 import {
   // Bar,
   // BarChart,
@@ -56,6 +58,8 @@ export function Resultados() {
   const [candidatos, setCandidatos] = useState([])
   const [votosPorCandidato, setVotosPorCandidato] = useState()
 
+  const { width } = useScreenSize()
+
   const data = useMemo(
     () =>
       candidatos.length > 0
@@ -79,8 +83,6 @@ export function Resultados() {
         : [],
     [candidatos, votosPorCandidato]
   )
-
-  console.log(data)
 
   const navigate = useNavigate()
 
@@ -161,7 +163,7 @@ export function Resultados() {
           />
         </Col>
         <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-          <ResponsiveContainer width="100%" aspect={2}>
+          <ResponsiveContainer width="100%" aspect={width < 768 ? 1 : 2}>
             <PieChart width={1000} height={1000}>
               <Pie
                 data={data}
